@@ -8,12 +8,12 @@
 
 #### Current Stage
 
-- Setting up project
+- Create window
+- Colour window
 
 #### Next Steps
 
-- Create window
-- Colour window
+- Triangle
 
 #### To work on
 
