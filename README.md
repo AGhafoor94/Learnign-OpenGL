@@ -4,6 +4,7 @@
 
 - GLFW (built in libraries folder)
 - glad (in location of source folder with main.c)
+- CMake
 
 #### Current Stage
 
