@@ -32,9 +32,12 @@ int main() {
     // every 3 floats = 1 coordinate
     // left corner, right corner and then top corner
     GLfloat verticies[] = {
-        -0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f,
-        0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f,
-        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f,
+        -0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f, // lower left
+        0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f, // lower right
+        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f, // top
+        -0.5f / 2, 0.5f * (float)sqrt(3) / 6, 0.0f, // inner left
+        0.5f / 2, 0.5f * (float) sqrt(3) / 6, 0.0f, // inner right
+        0.0f, -0.5f * (float) sqrt(3) / 3, 0.0f // inner down
     };
     // Shaders are opengl objects and can only be accessed by referencing a value
 
@@ -84,14 +87,24 @@ int main() {
 
     // now to tell opengl how to interpret them
     // need to send in batches of data from cpu to gpu
-
+    /*GLuint indicies[] = {
+        0,3,5,
+        3,2,4,
+        5,4,1
+    };*/
+    GLuint indicies[] = {
+        5,3,0,
+        4,2,3,
+        1,4,5
+    };
     GLuint v_a_o;
     GLuint v_b_o;
+    GLuint e_b_o;
     // generate VAO BEFORE VBO
     glGenVertexArrays(1, &v_a_o);
     // only have 1 3d object currently
     glGenBuffers(1, &v_b_o);
-
+    glGenBuffers(1, &e_b_o);
     // Binding: makes a certain object the current object. 
     // bind VAO to use it
     glBindVertexArray(v_a_o);
@@ -99,11 +112,12 @@ int main() {
     // we're using an array of buffers
     glBindBuffer(GL_ARRAY_BUFFER, v_b_o);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e_b_o);
     // now to store in memory buffer
     // specify use of data: stream (modified once and used one time), static (modified once but used many times), dynamic (modified multiple times and used multiple times)
     // Draw: image modifed, Read and Static
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
-
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
     // vertex array object (VAO) stores pointers to one or more VBOs and tells opengl how to interpret them, lets you switch quickly between VBOs
 
     // now to bind VAO, configure:
@@ -115,9 +129,10 @@ int main() {
     // optional
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Clear buffer, this is the back buffer which will need to be sent to front buffer
-    glClearColor(0.3f, 0.4f, 1.0f, 1.0f);
+    glClearColor(0.4f, 0.2f, 1.0f, 0.8f);
 
     // using this command to clear buffer and for OpenGL to use
     glClear(GL_COLOR_BUFFER_BIT);
@@ -134,8 +149,8 @@ int main() {
         glBindVertexArray(v_a_o);
         // Now to draw
         // specifying type e.g. triangles, starting index of verticies, and amount
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 91, GL_UNSIGNED_INT, 0);
         // swap back buffer with front buffer
         glfwSwapBuffers(glfw_window);
         // poll messages
@@ -144,6 +159,7 @@ int main() {
 
     glDeleteVertexArrays(1, &v_a_o);
     glDeleteBuffers(1, &v_b_o);
+    glDeleteBuffers(1, &e_b_o);
     glDeleteProgram(shader_program);
     glfwDestroyWindow(glfw_window);
     glfwTerminate();

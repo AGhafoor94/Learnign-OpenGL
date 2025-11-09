@@ -10,10 +10,11 @@
 
 - Create window
 - Colour window
+- Triangle
 
 #### Next Steps
 
-- Triangle
+- Index buffers
 
 #### To work on
 
@@ -38,3 +39,12 @@
 		- adds colours to pixels, lighting shadows
 	- 6th stage: Tests and blending
 		- belnding of transparent objects and colours
+
+- Index buffer tells OpenGL the order in which it goes over the verticies e.g.
+	- Zelda tri-force triangle
+	-			2
+	-		3		5
+	-	 0		4		1
+	- indices = [0,4,3
+	-			 4,1,5
+	-			 3,5,2]
