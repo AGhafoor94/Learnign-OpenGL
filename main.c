@@ -3,6 +3,7 @@
 // GLFW (include after glad)
 // -mwindows
 #include <GLFW/glfw3.h>
+#include <math.h>
 
 
 int main() {
@@ -31,9 +32,9 @@ int main() {
     // every 3 floats = 1 coordinate
     // left corner, right corner and then top corner
     GLfloat verticies[] = {
-        -0.5f, -0.5f * 1.73205080757f / 3, 0.0f,
-        0.5f, 0.5f * 1.73205080757f / 3, 0.0f,
-        0.0f, 0.5f * 1.73205080757f * 2 / 3, 0.0f,
+        -0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f,
+        0.5f, -0.5f * (float)sqrt(3) / 3, 0.0f,
+        0.0f, 0.5f * (float)sqrt(3) * 2 / 3, 0.0f,
     };
     // Shaders are opengl objects and can only be accessed by referencing a value
 
@@ -78,8 +79,8 @@ int main() {
     // link shaders
     glLinkProgram(shader_program);
 
-    glDeleteShaders(vertex_shader);
-    glDeleteShaders(fragment_shader);
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 
     // now to tell opengl how to interpret them
     // need to send in batches of data from cpu to gpu
@@ -105,9 +106,18 @@ int main() {
 
     // vertex array object (VAO) stores pointers to one or more VBOs and tells opengl how to interpret them, lets you switch quickly between VBOs
 
+    // now to bind VAO, configure:
+    // way of communicating with the vertex shader from the outside
+    // Index of vertex attribute, how many verticies, what kind of values, if we have coords as ints, amount of data for each verticies, offset (pointer to verticies begin in array) 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // enable to use
+    glEnableVertexAttribArray(0);
+    // optional
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     // Clear buffer, this is the back buffer which will need to be sent to front buffer
-    glClearColor(0.7f, 0.3f, 0.17f, 1.0f);
+    glClearColor(0.3f, 0.4f, 1.0f, 1.0f);
 
     // using this command to clear buffer and for OpenGL to use
     glClear(GL_COLOR_BUFFER_BIT);
@@ -116,10 +126,25 @@ int main() {
     glfwSwapBuffers(glfw_window);
 
     while (!glfwWindowShouldClose(glfw_window)) {
+        //glClearColor(0.7f, 0.3f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // now to use shader program
+        glUseProgram(shader_program);
+        // bind VAO
+        glBindVertexArray(v_a_o);
+        // Now to draw
+        // specifying type e.g. triangles, starting index of verticies, and amount
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // swap back buffer with front buffer
+        glfwSwapBuffers(glfw_window);
         // poll messages
         glfwPollEvents();
     }
 
+    glDeleteVertexArrays(1, &v_a_o);
+    glDeleteBuffers(1, &v_b_o);
+    glDeleteProgram(shader_program);
     glfwDestroyWindow(glfw_window);
     glfwTerminate();
 
